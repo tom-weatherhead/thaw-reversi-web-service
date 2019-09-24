@@ -5,9 +5,6 @@
 // Use chai and chai-http to test our app.
 // See https://groundberry.github.io/development/2016/12/10/testing-express-with-mocha-and-chai.html
 
-// const pkg = require('..');
-// const app = pkg.app;
-
 // **** BEGIN : Construct an Express app that contains a router that has our game engine in it ****
 const express = require('express');
 const cors = require('cors');
@@ -22,10 +19,8 @@ require('..')(router);
 app.use('/reversi', router);
 // **** END : Construct an Express app that contains a router that has our game engine in it ****
 
-// const gameEngine = pkg.gameEngine;
-const gameEngine = require('thaw-reversi-engine');
-// const errorMessages = gameEngine.errorMessages;
-// const testDescriptors = gameEngine.testDescriptors;
+const engine = require('thaw-reversi-engine');
+/*
 const testDescriptors = [
 	{
 		name: 'SmokeTest00Bogus',
@@ -33,7 +28,8 @@ const testDescriptors = [
 		// . . .
 		// . . .
 		// boardString: '        ' + '        ' + '        ' + '   XO   ' + '   OX   ' + '        ' + '        ' + '        ',
-		boardString: gameEngine.createInitialBoard().replace(/ /g, 'E'),
+		// boardString: engine.createInitialBoard().replace(/ /g, 'E'),
+		boardString: engine.createInitialState().boardAsString.replace(/ /g, 'E'),
 		player: 'X',
 		maxPly: 5,
 		verificationFunction: (engine, expect, result) => {
@@ -53,6 +49,7 @@ const testDescriptors = [
 		}
 	}
 ];
+ */
 
 const chai = require('chai');
 const chaiHttp = require('chai-http');
@@ -62,27 +59,30 @@ const expect = chai.expect;
 chai.use(chaiHttp);
 
 describe('App', () => {
-	testDescriptors.forEach(testDescriptor => {
+	engine.testDescriptors.filter(t => !t.doNotTestThroughWebService).forEach(testDescriptor => {
 		describe(testDescriptor.name, () => {
 			it('Rocks!', done => {
 				// Arrange
-				const url = '/reversi/' + testDescriptor.boardString.replace(/ /g, 'E') + '/' + testDescriptor.player + '/' + testDescriptor.maxPly;
+				const initialData = testDescriptor.arrangeFunction(engine);
+				// const url = '/reversi/' + testDescriptor.boardString.replace(/ /g, 'E') + '/' + testDescriptor.player + '/' + testDescriptor.maxPly;
+				const url = `/reversi/${initialData.boardAsString}/${initialData.player}/${initialData.maxPly}`;
 
 				// Act
 				chai.request(app).get(url).end((error, result) => {
 					// Assert
 
 					if (error) {
-						expect(testDescriptor.errorHandlingFunction).to.be.not.null;	// eslint-disable-line no-unused-expressions
-						// testDescriptor.errorHandlingFunction(gameEngine, expect, error);
-						testDescriptor.errorHandlingFunction(gameEngine, expect, result.error.text);
+						console.error(`Error in test ${testDescriptor.name} :`, error);
+						//expect(testDescriptor.errorHandlingFunction).to.be.not.null;	// eslint-disable-line no-unused-expressions
+						// testDescriptor.errorHandlingFunction(engine, expect, error);
+						// testDescriptor.errorHandlingFunction(engine, expect, result.error.text);
 					} else {
 						expect(error).to.be.null;										// eslint-disable-line no-unused-expressions
 						expect(result).to.be.not.null;									// eslint-disable-line no-unused-expressions
 						expect(result.body).to.be.not.null;								// eslint-disable-line no-unused-expressions
 						expect(testDescriptor.verificationFunction).to.be.not.null;		// eslint-disable-line no-unused-expressions
 						// console.log('chai request get result:', result);
-						testDescriptor.verificationFunction(gameEngine, expect, result.body);
+						testDescriptor.assertFunction(engine, initialData, expect, result.body);
 					}
 
 					done();
