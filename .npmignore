@@ -57,4 +57,12 @@ typings/
 # dotenv environment variables file
 .env
 
+test/
+
+.editorconfig
+.eslintrc
+.idea
+.travis.yml
+Gruntfile.js
+
 .DS_Store

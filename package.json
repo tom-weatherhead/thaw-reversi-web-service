@@ -17,6 +17,7 @@
 		"rebuild": "npm run clean && npm run build",
 		"lint": "grunt eslint",
 		"mocha": "grunt mochaTest",
+		"start": "node src/server.js",
 		"test": "grunt"
 	},
 	"bin": {
@@ -24,7 +25,7 @@
 	},
 	"dependencies": {
 		"express-mixin": "^0.0.3",
-		"thaw-reversi-engine": "file:thaw-reversi-engine-0.2.0.tgz"
+		"thaw-reversi-engine": "^0.2.0"
 	},
 	"devDependencies": {
 		"babel-mixin": "^0.0.6",
