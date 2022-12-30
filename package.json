@@ -28,7 +28,7 @@
 		"thaw-reversi-engine": "^0.2.0"
 	},
 	"devDependencies": {
-		"babel-mixin": "^0.0.6",
+		"babel-mixin": "^0.1.0",
 		"chai": "^4.2.0",
 		"chai-http": "^4.3.0"
 	},
